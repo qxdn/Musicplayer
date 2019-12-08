@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Musicplayer</string>
+    <string name="username">请输入用户名</string>
+    <string name="password">请输入密码</string>
+    <string name="rememberuser">记住用户</string>
+    <string name="login">登录</string>
+    <string name="quit">退出</string>
+</resources>
