@@ -1,0 +1,64 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#25272d">
+
+    <TextView
+        android:id="@+id/playsongname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/white"
+        android:textSize="22sp"
+        android:text="Music"
+        android:layout_marginTop="50dp"/>
+
+
+    <TextView
+        android:id="@+id/playsinger"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="#80FFFFFF"
+        android:textSize="15sp"
+        android:text="Author"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/playsongname"/>
+
+
+    <co.mobiwise.library.MusicPlayerView
+        android:id="@+id/mpv"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:layout_below="@+id/playsinger"
+        app:textSize = "14sp"
+        app:textColor = "#80FFFFFF"
+        app:buttonColor = "#ff0028"
+        app:progressLoadedColor = "#00815e"
+        app:cover="@drawable/music"/>
+
+
+
+    <ImageView
+        android:id="@+id/musicnext"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/icon_next"
+        android:layout_below="@+id/mpv"
+        android:layout_alignRight="@+id/mpv"
+        android:layout_marginTop="50dp"/>
+
+
+    <ImageView
+        android:id="@+id/musicprevious"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/icon_previous"
+        android:layout_below="@+id/mpv"
+        android:layout_alignLeft="@+id/mpv"
+        android:layout_marginTop="50dp"/>
+
+</RelativeLayout>
