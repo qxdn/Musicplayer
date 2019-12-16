@@ -58,13 +58,12 @@ public class LoginActivity extends AppCompatActivity  {
                     }
                     editor.apply();
 
-                    /*
+
                     String user=username.getText().toString();
                     Intent intent=new Intent(LoginActivity.this,MusicListActivity.class);
                     intent.putExtra("username",user);
                     startActivity(intent);
 
-                     */
                 }
             }
         });
