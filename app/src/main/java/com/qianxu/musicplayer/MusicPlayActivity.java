@@ -44,10 +44,13 @@ public class MusicPlayActivity extends AppCompatActivity {
         String author=intent.getStringExtra("author");
         long time=intent.getLongExtra("time",0);
 
-        Song.setText(songname);
-        Singer.setText(author);
-        mpv.setMax((int)(time/1000));
+        Song.setText(songname); //设置歌曲名
+        Singer.setText(author); //设置作者
+        mpv.setMax((int)(time/1000));   //设置时长
 
+        mpv.start();
+
+        //按键绑定
         mpv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
