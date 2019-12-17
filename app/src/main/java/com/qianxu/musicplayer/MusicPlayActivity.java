@@ -4,6 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -43,10 +47,13 @@ public class MusicPlayActivity extends AppCompatActivity {
         String songname=intent.getStringExtra("song");  //跳转
         String author=intent.getStringExtra("author");
         long time=intent.getLongExtra("time",0);
+        byte[] bytes=intent.getByteArrayExtra("cover");
+        Drawable dw=bytes2Drawable(bytes);
 
         Song.setText(songname); //设置歌曲名
         Singer.setText(author); //设置作者
         mpv.setMax((int)(time/1000));   //设置时长
+        mpv.setCoverDrawable(dw);
 
         //组件问题
         mpv.stop();
@@ -83,6 +90,10 @@ public class MusicPlayActivity extends AppCompatActivity {
         localBroadcastManager.registerReceiver(localReceiver,intentFilter);
 
     }
+    private Drawable bytes2Drawable(byte[] bytes){
+        Bitmap bmap= BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+       return new BitmapDrawable(bmap);
+    }
 
     public void localboardsend(int code){
         Intent intent=new Intent("com.qianxu.musicplayer.LOCAL_BROADCAST_MVIEW");
@@ -98,10 +109,14 @@ public class MusicPlayActivity extends AppCompatActivity {
                 String name = intent.getStringExtra("SongName");
                 String author = intent.getStringExtra("SongAuthor");
                 long time = intent.getLongExtra("SongTime", 0);
+                byte[] bytes=intent.getByteArrayExtra("cover");
                 Song.setText(name); //设置歌曲名
                 Singer.setText(author); //设置作者
+                Drawable dw=bytes2Drawable(bytes);
+                mpv.setCoverDrawable(dw);
                 mpv.setMax((int) (time / 1000));   //设置时长
                 mpv.setProgress(0);
+
             }
         }
     }

@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,6 +96,8 @@ public class MusicListActivity extends AppCompatActivity {
                 intent.putExtra("song",song.getName());
                 intent.putExtra("author",song.getAuthorname());
                 intent.putExtra("time",song.getDuration());
+                intent.putExtra("cover",Bitmap2Bytes(song.getImageBitmap()));
+
                 startActivity(intent);
 
                 musicService.Start(song.getSongPath());  //启动播放
@@ -134,7 +137,7 @@ public class MusicListActivity extends AppCompatActivity {
                     String url = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
                     //获取歌曲时长
                     long time=cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
-
+                    //获取专辑图片
                     Bitmap bm=getBitmapCover(url);
                     Song song = new Song(disName, artist, bm, url,time);
                     //Song song = new Song(disName, artist, R.drawable.music, url,time);
@@ -157,43 +160,51 @@ public class MusicListActivity extends AppCompatActivity {
         byte[] picture = mediaMetadataRetriever.getEmbeddedPicture();
         if (picture != null) {
             Bitmap bMap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+            bMap=Bitmap.createScaledBitmap(bMap,350,350,true);
             return bMap;
         } else {
             return BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.music);
         }
     }
 
-    public void NextSong(){
+    private byte[] Bitmap2Bytes(Bitmap bm){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        return baos.toByteArray();
+    }
+
+    private void NextSong(){
         songPosition++;
         if(songPosition>=songList.size())
             songPosition=0;
         Song song=songList.get(songPosition);
         musicService.Start(song.getSongPath());
-        localboardsend(song.getName(),song.getAuthorname(),song.getDuration());
+        localboardsend(song.getName(),song.getAuthorname(),song.getDuration(),Bitmap2Bytes(song.getImageBitmap()));
     }
 
-    public void PreSong(){
+    private void PreSong(){
         songPosition--;
         if(songPosition<0)
             songPosition=(songList.size()-1);
         Song song=songList.get(songPosition);
 
         musicService.Start(song.getSongPath());
-        localboardsend(song.getName(),song.getAuthorname(),song.getDuration());
+        localboardsend(song.getName(),song.getAuthorname(),song.getDuration(),Bitmap2Bytes(song.getImageBitmap()));
     }
 
     //发送歌曲信息
-    public void localboardsend(String songname,String author,long time){
+    public void localboardsend(String songname,String author,long time,byte[] bytes){
         Intent intent=new Intent("com.qianxu.musicplayer.LOCAL_BROADCAST_MLIST");
         intent.putExtra("SongName",songname);
         intent.putExtra("SongAuthor",author);
         intent.putExtra("SongTime",time);
+        intent.putExtra("cover",bytes);
         localBroadcastManager.sendBroadcast(intent);
     }
 
 
 
-    //本地广播
+    //本地广播接收
     class LocalReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
