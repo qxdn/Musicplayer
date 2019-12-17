@@ -9,10 +9,12 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -35,8 +37,6 @@ public class MusicListActivity extends AppCompatActivity {
     private List<Song> songList=new ArrayList<Song>(); //歌曲列表
     private int songPosition; //当前歌曲位置
 
-    private IntentFilter intentFilter;
-    private HeadsetPlugReceiver headsetPlugReceiver;//耳机
 
     private MusicService musicService;
     private ServiceConnection connection =new ServiceConnection() {
@@ -65,12 +65,6 @@ public class MusicListActivity extends AppCompatActivity {
 
         //本地广播
         localBroadcastManager=localBroadcastManager.getInstance(this);
-
-        //耳机权限
-        intentFilter = new IntentFilter();
-        intentFilter.addAction("android.intent.action.HEADSET_PLUG");
-        headsetPlugReceiver = new HeadsetPlugReceiver();
-        registerReceiver(headsetPlugReceiver, intentFilter);
 
 
         TextView hellotext=(TextView)findViewById(R.id.hellouser);
@@ -119,6 +113,7 @@ public class MusicListActivity extends AppCompatActivity {
         //注册本地广播
         IntentFilter intentFilter=new IntentFilter();
         intentFilter.addAction("com.qianxu.musicplayer.LOCAL_BROADCAST_MVIEW");
+        intentFilter.addAction("com.qianxu.musicplayer.LOCAL_BROADCAST_MCOMPLETE");
         localReceiver=new LocalReceiver();
         localBroadcastManager.registerReceiver(localReceiver,intentFilter);
     }
@@ -140,9 +135,9 @@ public class MusicListActivity extends AppCompatActivity {
                     //获取歌曲时长
                     long time=cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
 
-
-                    //Song song = new Song(disName, artist, BitmapFactory.decodeResource(getResources(),R.drawable.music), url,time);
-                    Song song = new Song(disName, artist, R.drawable.music, url,time);
+                    Bitmap bm=getBitmapCover(url);
+                    Song song = new Song(disName, artist, bm, url,time);
+                    //Song song = new Song(disName, artist, R.drawable.music, url,time);
                     songList.add(song);
                 }
             }
@@ -151,6 +146,20 @@ public class MusicListActivity extends AppCompatActivity {
         }finally {
             if(cursor!=null)
                 cursor.close();
+        }
+    }
+
+
+    //转换为图片
+    private Bitmap getBitmapCover(String MediaUri){
+        MediaMetadataRetriever mediaMetadataRetriever=new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(MediaUri);
+        byte[] picture = mediaMetadataRetriever.getEmbeddedPicture();
+        if (picture != null) {
+            Bitmap bMap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+            return bMap;
+        } else {
+            return BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.music);
         }
     }
 
@@ -182,21 +191,7 @@ public class MusicListActivity extends AppCompatActivity {
         localBroadcastManager.sendBroadcast(intent);
     }
 
-    //耳机广播接收器
-    class HeadsetPlugReceiver extends BroadcastReceiver{
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equalsIgnoreCase("android.intent.action.HEADSET_PLUG")){
-                if(intent.hasExtra("state")){
-                    if (intent.getIntExtra("state", 0) == 1){
-                        Toast.makeText(context, "耳机连接", Toast.LENGTH_SHORT).show();
-                    }else{
-                        Toast.makeText(context, "耳机断开", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        }
-    }
+
 
     //本地广播
     class LocalReceiver extends BroadcastReceiver{
@@ -215,6 +210,8 @@ public class MusicListActivity extends AppCompatActivity {
                     break;
                 default:break;
                 }
+            }else if(intent.getAction().equalsIgnoreCase("com.qianxu.musicplayer.LOCAL_BROADCAST_MCOMPLETE")){
+               NextSong();
             }
         }
     }
@@ -237,7 +234,6 @@ public class MusicListActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(headsetPlugReceiver); //广播释放
         localBroadcastManager.unregisterReceiver(localReceiver);
         unbindService(connection);  //解绑服务
     }

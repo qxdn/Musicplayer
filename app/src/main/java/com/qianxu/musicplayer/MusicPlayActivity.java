@@ -79,11 +79,9 @@ public class MusicPlayActivity extends AppCompatActivity {
         //注册本地广播
         IntentFilter intentFilter=new IntentFilter();
         intentFilter.addAction("com.qianxu.musicplayer.LOCAL_BROADCAST_MLIST");
-        intentFilter.addAction("com.qianxu.musicplayer.LOCAL_BROADCAST_MCOMPLETE");
         localReceiver=new LocalReceiver();
         localBroadcastManager.registerReceiver(localReceiver,intentFilter);
 
-        //localBroadcastManager.registerReceiver(localReceiver,intentFilter);
     }
 
     public void localboardsend(int code){
@@ -104,8 +102,6 @@ public class MusicPlayActivity extends AppCompatActivity {
                 Singer.setText(author); //设置作者
                 mpv.setMax((int) (time / 1000));   //设置时长
                 mpv.setProgress(0);
-            }else if(intent.getAction().equalsIgnoreCase("com.qianxu.musicplayer.LOCAL_BROADCAST_MCOMPLETE")){
-                localboardsend(nextmusiccode);
             }
         }
     }
