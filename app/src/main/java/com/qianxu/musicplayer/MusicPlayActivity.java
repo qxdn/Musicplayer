@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -48,8 +48,9 @@ public class MusicPlayActivity extends AppCompatActivity {
         Singer.setText(author); //设置作者
         mpv.setMax((int)(time/1000));   //设置时长
 
+        //组件问题
+        mpv.stop();
         mpv.start();
-
         //按键绑定
         mpv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,41 +60,48 @@ public class MusicPlayActivity extends AppCompatActivity {
                 }else {
                     mpv.start();
                 }
-                Intent intent=new Intent("com.qianxu.musicplayer.LOCAL_BROADCAST_MVIEW");
-                intent.putExtra("musicplayercode",pausemusiccode);
-                localBroadcastManager.sendBroadcast(intent);
+                localboardsend(pausemusiccode);
             }
         });
         nextmusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent("com.qianxu.musicplayer.LOCAL_BROADCAST_MVIEW");
-                intent.putExtra("musicplayercode",nextmusiccode);
-                localBroadcastManager.sendBroadcast(intent);
+                localboardsend(nextmusiccode);
             }
         });
         premusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent("com.qianxu.musicplayer.LOCAL_BROADCAST_MVIEW");
-                intent.putExtra("musicplayercode",premusiccode);
-                localBroadcastManager.sendBroadcast(intent);
+                localboardsend(premusiccode);
             }
         });
 
         //注册本地广播
         IntentFilter intentFilter=new IntentFilter();
-        intentFilter.addAction("com.qianxu.musicplayer.LOCAL_BROADCAST_MVIEW");
+        intentFilter.addAction("com.qianxu.musicplayer.LOCAL_BROADCAST_MLIST");
         localReceiver=new LocalReceiver();
         localBroadcastManager.registerReceiver(localReceiver,intentFilter);
     }
 
+    public void localboardsend(int code){
+        Intent intent=new Intent("com.qianxu.musicplayer.LOCAL_BROADCAST_MVIEW");
+        intent.putExtra("musicplayercode",code);
+        localBroadcastManager.sendBroadcast(intent);
+    }
 
-
+    //接受歌曲信息
     class LocalReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(MusicPlayActivity.this,""+intent.getIntExtra("musicplayercode",5),Toast.LENGTH_LONG).show();
+            if (intent.getAction().equalsIgnoreCase("com.qianxu.musicplayer.LOCAL_BROADCAST_MLIST")) {
+                String name = intent.getStringExtra("SongName");
+                String author = intent.getStringExtra("SongAuthor");
+                long time = intent.getLongExtra("SongTime", 0);
+                Song.setText(name); //设置歌曲名
+                Singer.setText(author); //设置作者
+                mpv.setMax((int) (time / 1000));   //设置时长
+                mpv.setProgress(0);
+            }
         }
     }
 

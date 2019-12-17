@@ -3,14 +3,14 @@ package com.qianxu.musicplayer;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 
 
 public class MusicService extends Service {
 
-    private MediaPlayer mediaPlayer=new MediaPlayer();
+    private MediaPlayer mediaPlayer;
 
     public MusicService() {
     }
@@ -31,8 +31,7 @@ public class MusicService extends Service {
         if(mediaPlayer!=null)
             mediaPlayer.reset();
         try {
-            mediaPlayer.setDataSource(path);
-            mediaPlayer.prepare();
+            mediaPlayer=MediaPlayer.create(this, Uri.parse(path));
             mediaPlayer.start();
         }catch (Exception e){
             e.printStackTrace();
@@ -41,17 +40,25 @@ public class MusicService extends Service {
 
     //暂停
     public void Pause(){
-        if(null!=mediaPlayer){
-           mediaPlayer.pause();
+        if(mediaPlayer!=null){
+            mediaPlayer.pause();
         }
     }
 
     //继续
     public void Continue(){
-        if(null!=mediaPlayer){
+        if(mediaPlayer!=null){
             mediaPlayer.start();
         }
     }
+
+    public boolean isPlaying(){
+        if(mediaPlayer!=null)
+            return mediaPlayer.isPlaying();
+        else
+            return false;
+    }
+
 
 
 
