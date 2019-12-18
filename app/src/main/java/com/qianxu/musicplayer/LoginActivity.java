@@ -16,6 +16,8 @@ public class LoginActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.loginlayout);
+
+        //找到组件
         final EditText username=(EditText)findViewById(R.id.login_username);
         final EditText password=(EditText)findViewById(R.id.login_password);
 
@@ -32,6 +34,7 @@ public class LoginActivity extends AppCompatActivity  {
         Button quit=(Button)findViewById(R.id.btn_quit);
         Button login=(Button)findViewById(R.id.btn_login);
 
+        //绑定按键事件
         quit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -43,12 +46,12 @@ public class LoginActivity extends AppCompatActivity  {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(username.getText().toString().equals("")||username.getText().toString()==null||!password.getText().toString().equals("123456"))
+                if(username.getText().toString().equals("")||username.getText().toString()==null||!password.getText().toString().equals("123456")) //用户名密码错误
                     Toast.makeText(LoginActivity.this,"用户名或密码错误",Toast.LENGTH_LONG).show();
                 else
                 {
                     SharedPreferences.Editor editor=pref.edit();
-                    if(Remeberuser.isChecked())
+                    if(Remeberuser.isChecked()) //保持当前信息
                     {
                         editor.putString("username",username.getText().toString());
                         editor.putString("password",password.getText().toString());
@@ -67,8 +70,6 @@ public class LoginActivity extends AppCompatActivity  {
                 }
             }
         });
-
     }
-
 }
 

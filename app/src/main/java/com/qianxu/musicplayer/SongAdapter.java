@@ -13,7 +13,7 @@ import org.w3c.dom.Text;
 
 import java.util.List;
 
-public class SongAdapter extends ArrayAdapter<Song> {
+public class SongAdapter extends ArrayAdapter<Song> { //适配器
     private int resourceId;
     public SongAdapter(Context context, int textViewResourceId, List<Song> objects){
         super(context,textViewResourceId,objects);

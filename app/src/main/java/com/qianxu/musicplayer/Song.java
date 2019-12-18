@@ -3,10 +3,10 @@ package com.qianxu.musicplayer;
 import android.graphics.Bitmap;
 
 public class Song {
-    private String name;
-    private String Authorname;
-    private Bitmap Image;
-    private String SongPath;
+    private String name;  //歌名
+    private String Authorname; //作者名
+    private Bitmap Image;   //专辑封面
+    private String SongPath; //歌曲路径
     private long Duration; //歌曲时长
     public Song(String name,String Authorname,Bitmap Image,String SongPath,long Duration){
         this.name=name;

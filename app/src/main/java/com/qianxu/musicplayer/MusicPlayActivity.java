@@ -43,11 +43,11 @@ public class MusicPlayActivity extends AppCompatActivity {
 
         localBroadcastManager=LocalBroadcastManager.getInstance(this);//获取实例
 
-        final Intent intent=getIntent();
-        String songname=intent.getStringExtra("song");  //跳转
-        String author=intent.getStringExtra("author");
-        long time=intent.getLongExtra("time",0);
-        byte[] bytes=intent.getByteArrayExtra("cover");
+        final Intent intent=getIntent(); //获取Intent
+        String songname=intent.getStringExtra("song"); //歌名
+        String author=intent.getStringExtra("author"); //歌曲作者
+        long time=intent.getLongExtra("time",0); //时长
+        byte[] bytes=intent.getByteArrayExtra("cover"); //获取专辑封面
         Drawable dw=bytes2Drawable(bytes);
 
         Song.setText(songname); //设置歌曲名
@@ -55,7 +55,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         mpv.setMax((int)(time/1000));   //设置时长
         mpv.setCoverDrawable(dw);
 
-        //组件问题
+        //组件问题 先stop在start 暂停按键才正常
         mpv.stop();
         mpv.start();
         //按键绑定

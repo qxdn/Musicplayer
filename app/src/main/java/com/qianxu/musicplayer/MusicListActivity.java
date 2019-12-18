@@ -67,6 +67,12 @@ public class MusicListActivity extends AppCompatActivity {
         //本地广播
         localBroadcastManager=localBroadcastManager.getInstance(this);
 
+        //动态权限   读取外部存储器权限
+        if(ContextCompat.checkSelfPermission(MusicListActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(MusicListActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
+        }else {
+            InitSongs();
+        }
 
         TextView hellotext=(TextView)findViewById(R.id.hellouser);
         Intent intent=getIntent();
@@ -74,12 +80,7 @@ public class MusicListActivity extends AppCompatActivity {
         hellotext.setText("欢迎"+username+"!");
         Button quit =(Button)findViewById(R.id.musicquit);
 
-        //动态权限   读取外部存储器权限
-        if(ContextCompat.checkSelfPermission(MusicListActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(MusicListActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
-        }else {
-            InitSongs();
-        }
+
 
         ListView listView=(ListView)findViewById(R.id.song);
         SongAdapter adapter=new SongAdapter(MusicListActivity.this,R.layout.song_item,songList);
@@ -157,16 +158,17 @@ public class MusicListActivity extends AppCompatActivity {
     private Bitmap getBitmapCover(String MediaUri){
         MediaMetadataRetriever mediaMetadataRetriever=new MediaMetadataRetriever();
         mediaMetadataRetriever.setDataSource(MediaUri);
-        byte[] picture = mediaMetadataRetriever.getEmbeddedPicture();
-        if (picture != null) {
-            Bitmap bMap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
-            bMap=Bitmap.createScaledBitmap(bMap,350,350,true);
+        byte[] picture = mediaMetadataRetriever.getEmbeddedPicture();  //读取图片字节流
+        if (picture != null) {  //封面非空
+            Bitmap bMap = BitmapFactory.decodeByteArray(picture, 0, picture.length);  //字节转Bitmap
+            bMap=Bitmap.createScaledBitmap(bMap,350,350,true);   //Bitmap缩放
             return bMap;
-        } else {
+        } else {   //没有专辑封面，使用默认图片
             return BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.music);
         }
     }
 
+    //Bitmap转bytes
     private byte[] Bitmap2Bytes(Bitmap bm){
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
@@ -174,14 +176,15 @@ public class MusicListActivity extends AppCompatActivity {
     }
 
     private void NextSong(){
-        songPosition++;
-        if(songPosition>=songList.size())
+        songPosition++;  //当前选中歌曲位置
+        if(songPosition>=songList.size())  //超出范围
             songPosition=0;
-        Song song=songList.get(songPosition);
-        musicService.Start(song.getSongPath());
-        localboardsend(song.getName(),song.getAuthorname(),song.getDuration(),Bitmap2Bytes(song.getImageBitmap()));
+        Song song=songList.get(songPosition); //获取歌曲实例
+        musicService.Start(song.getSongPath()); //启动服务 播放音频
+        localboardsend(song.getName(),song.getAuthorname(),song.getDuration(),Bitmap2Bytes(song.getImageBitmap())); //发送本地广播
     }
 
+    //前一首
     private void PreSong(){
         songPosition--;
         if(songPosition<0)
@@ -208,26 +211,28 @@ public class MusicListActivity extends AppCompatActivity {
     class LocalReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equalsIgnoreCase("com.qianxu.musicplayer.LOCAL_BROADCAST_MVIEW")){
+            if(intent.getAction().equalsIgnoreCase("com.qianxu.musicplayer.LOCAL_BROADCAST_MVIEW")){  //播放界面按键按下时本地广播
             int code=intent.getIntExtra("musicplayercode",-1);
             switch (code){
-                case 0:PreSong();break;
-                case 1:NextSong();break;
+                case 0:PreSong();break;  //前一首
+                case 1:NextSong();break; //后一首
                 case 2:
-                    if(musicService.isPlaying())
-                        musicService.Pause();
+                    if(musicService.isPlaying())  //正在播放
+                        musicService.Pause();  //暂停
                     else
-                        musicService.Continue();
+                        musicService.Continue(); //继续
                     break;
                 default:break;
                 }
             }else if(intent.getAction().equalsIgnoreCase("com.qianxu.musicplayer.LOCAL_BROADCAST_MCOMPLETE")){
+                //一首播放完成事件
                NextSong();
             }
         }
     }
 
 
+    //外部存储权限获取结果
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
@@ -245,7 +250,7 @@ public class MusicListActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        localBroadcastManager.unregisterReceiver(localReceiver);
+        localBroadcastManager.unregisterReceiver(localReceiver); //解绑广播
         unbindService(connection);  //解绑服务
     }
 

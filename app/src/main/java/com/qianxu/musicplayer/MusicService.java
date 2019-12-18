@@ -25,7 +25,7 @@ public class MusicService extends Service {
         return new MusicBinder();
     }
 
-    class MusicBinder extends Binder{
+    class MusicBinder extends Binder{ //绑定Service
         public MusicService getService(){
             return MusicService.this;
         }
@@ -41,6 +41,7 @@ public class MusicService extends Service {
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
+                    //发送完成广播
                     Intent intent=new Intent("com.qianxu.musicplayer.LOCAL_BROADCAST_MCOMPLETE");
                     intent.putExtra("finishcode",1);
                     localBroadcastManager.sendBroadcast(intent);

@@ -10,7 +10,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        >
         <service
             android:name=".MusicService"
             android:enabled="true"
@@ -18,16 +19,17 @@
 
         <activity
             android:name=".LaunchActivity"
-            android:theme="@style/LaunchTheme">
+            android:theme="@style/LaunchTheme"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".MusicListActivity" />
-        <activity android:name=".MusicPlayActivity" />
+        <activity android:name=".LoginActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".MusicListActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".MusicPlayActivity" android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
